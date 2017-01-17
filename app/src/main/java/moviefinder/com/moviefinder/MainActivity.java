@@ -1,7 +1,10 @@
 package moviefinder.com.moviefinder;
 
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -17,12 +20,23 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
 
     private TextView mTextView;
+    private Toolbar appbar;
+    private DrawerLayout drawerLayout;
+    private NavigationView navView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mTextView = (TextView) findViewById(R.id.tv_1);
+
+        //appbar = (Toolbar)findViewById(R.id.appbar);
+        //setSupportActionBar(appbar);
+
+        //getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_favorite);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+       // mTextView = (TextView) findViewById(R.id.tv_1);
         searchExample();
     }
 
@@ -77,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                                     searchResponseDTO.getMovieOrSeriesSearchResultDTOList();
                             for (MovieOrSeriesSearchResultDTO movieOrSeriesSearchResultDTO : movieOrSeriesSearchResultDTOList) {
                                 String title = movieOrSeriesSearchResultDTO.getTitle() + "\n";
-                                mTextView.append(title);
+                                //mTextView.append(title);
                             }
                         }
                     }
