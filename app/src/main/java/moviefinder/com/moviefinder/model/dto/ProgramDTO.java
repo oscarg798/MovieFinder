@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Created by stephany.berrio on 16/01/17.
  */
-public class Production {
+public class ProgramDTO {
 
     @SerializedName("Title")
     private String title;
@@ -51,7 +51,7 @@ public class Production {
     @SerializedName("Response")
     private String response;
 
-    public Production(String title, String year, String rated, String released, String runtime,
+    public ProgramDTO(String title, String year, String rated, String released, String runtime,
                       String genre, String director, String writer, String actors, String plot,
                       String language, String country, String awards, String poster,
                       String metascore, String imdbRating, String imdbVotes, String imdbID,

@@ -1,78 +1,76 @@
-package moviefinder.com.moviefinder;
+package moviefinder.com.moviefinder.presentation.fragments;
 
+import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.List;
 
+import moviefinder.com.moviefinder.R;
 import moviefinder.com.moviefinder.api.ApiProvider;
 import moviefinder.com.moviefinder.model.dto.MovieOrSeriesSearchResultDTO;
+import moviefinder.com.moviefinder.model.dto.ProgramDTO;
 import moviefinder.com.moviefinder.model.dto.SearchResponseDTO;
-import moviefinder.com.moviefinder.presentation.fragments.ProgramsFragment;
+import moviefinder.com.moviefinder.presentation.adapters.ProgramListRecyclerViewAdapter;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
+/**
+ * A simple {@link Fragment} subclass.
+ * Activities that contain this fragment must implement the
+ * to handle interaction events.
+ * create an instance of this fragment.
+ */
+public class ProgramsFragment extends Fragment {
 
-    private TextView mTextView;
-    private Toolbar appbar;
-    private DrawerLayout drawerLayout;
-    private NavigationView navView;
-    private Fragment currentFragment;
+    private List<ProgramDTO> programDTOList;
+    private RecyclerView rvProgramList;
+    private ProgramListRecyclerViewAdapter programListRecyclerViewAdapter;
+    private FrameLayout flContent;
+    //private Callbacks.IFragmentReadyCallback IFragmentReadyCallback;
+    //private ProgressBar progressBar;
+    private GridLayoutManager gridLayoutManager;
+    //private SwipeRefreshLayout swipeRefreshLayout;
+    private boolean isRefreshing;
+    private boolean isFiltering = false;
+    private List<MovieOrSeriesSearchResultDTO> movieOrSeriesSearchResultDTO;
+
+    public ProgramsFragment() {
+        // Required empty public constructor
+    }
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @return A new instance of fragment programs.
+     */
+    public static ProgramsFragment newInstance() {
+        ProgramsFragment fragment = new ProgramsFragment();
+        Bundle args = new Bundle();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-
-       // mTextView = (TextView) findViewById(R.id.tv_1);
-        initViewComponents();
-        searchExample();
+        if (getArguments() != null) {
+        }
     }
 
-    /**
-     * This method init the view components and build the
-     * view for the activity
-     */
-    private void initViewComponents() {
-        appbar = (Toolbar)findViewById(R.id.appbar);
-        setSupportActionBar(appbar);
-
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_favorite);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
-        changeFragment(ProgramsFragment.newInstance());
-
-
-    }
-
-    /**
-     * Method for changing fragment
-     *
-     * @param fragment
-     */
-    public void changeFragment(Fragment fragment) {
-        this.currentFragment = fragment;
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fl_content, currentFragment)
-                .commitAllowingStateLoss();
-
-    }
-
-    /**
-     * This method shows an example about how to call the API using the Library and the endpoints
-     * defined
-     */
-    private void searchExample() {
+    private void getData() {
         /**
          * The first thing is obtain the object instance from the {@link ApiProvider} class, we
          * use the getInstance() method because the {@link ApiProvider} class is a singleton,
@@ -115,12 +113,8 @@ public class MainActivity extends AppCompatActivity {
                         SearchResponseDTO searchResponseDTO = response.body();
 
                         if (searchResponseDTO != null && searchResponseDTO.isResponse()) {
-                            List<MovieOrSeriesSearchResultDTO> movieOrSeriesSearchResultDTOList =
-                                    searchResponseDTO.getMovieOrSeriesSearchResultDTOList();
-                            for (MovieOrSeriesSearchResultDTO movieOrSeriesSearchResultDTO : movieOrSeriesSearchResultDTOList) {
-                                String title = movieOrSeriesSearchResultDTO.getTitle() + "\n";
-                                //mTextView.append(title);
-                            }
+                            movieOrSeriesSearchResultDTO = searchResponseDTO.getMovieOrSeriesSearchResultDTOList();
+                            populateViews();
                         }
                     }
 
@@ -130,4 +124,30 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
+
+    private void populateViews() {
+
+        gridLayoutManager = new GridLayoutManager(getContext(), 2);
+
+        rvProgramList.setLayoutManager(gridLayoutManager);
+        programListRecyclerViewAdapter = new ProgramListRecyclerViewAdapter(movieOrSeriesSearchResultDTO, getContext());
+        rvProgramList.setAdapter(programListRecyclerViewAdapter);
+
+    }
+
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_programs, container, false);
+        initViewComponents(view);
+        return view;
+    }
+
+    public void initViewComponents(View view){
+        rvProgramList = (RecyclerView) view.findViewById(R.id.rv_programs);
+        //flContent = (LinearLayout) view.findViewById(R.id.fl_content);
+        getData();
+    }
+
 }
